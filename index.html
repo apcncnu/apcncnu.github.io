@@ -1968,8 +1968,8 @@ function renderNewsPage(n){
 }
 
 function openNewsPage(n){
+  renderNewsPage(n);          // 同上：讓橫幅照片在轉場動畫進行中就開始下載
   playTransition(() => {
-    renderNewsPage(n);
     applyView('news');
     fallbackStack.push('news');
     if(historyOK){
@@ -2211,10 +2211,18 @@ function mediumSrc(src){
   return src.replace(/\.jpe?g$/i, '-m.webp');
 }
 
-/* 照片條的圖片標記：一律先不給 src，全部交給 armLazyStrip 決定何時載入。
-   連第一張也不預先載，是因為隱藏分頁（認識我們）裡的照片條在 display:none 時
-   不會與視窗相交，這樣整條都不會被下載；分頁一打開才開始抓。 */
-function stripImg(src, alt){
+/* 照片條的圖片標記：預設先不給 src，交給 armLazyStrip 決定何時載入。
+   這樣隱藏分頁（認識我們）裡的照片條在 display:none 時不會與視窗相交，
+   整條都不會被下載，分頁一打開才開始抓。
+
+   cached:true 用在狗狗詳細頁的第一張。那一張跟列表頁卡片上的封面是同一張照片，
+   卡片用的是 640px 的 -t.webp，使用者從列表點進來時它已經在瀏覽器快取裡，
+   直接沿用就能「立刻」顯示，不必再等 -m.webp 下載。
+   （640px 與 700px 只差 9%，肉眼看不出來，不值得為此多抓一次。） */
+function stripImg(src, alt, cached){
+  if(cached){
+    return `<img src="${thumbSrc(src)}" alt="${alt}" decoding="async" onerror="this.onerror=null;this.src='${src}'">`;
+  }
   return `<img data-src="${mediumSrc(src)}" alt="${alt}" decoding="async" onerror="this.onerror=null;this.src='${src}'">`;
 }
 
@@ -2278,7 +2286,7 @@ function renderDogPage(d){
           <div class="strip-track">
             ${pics.map((src, i) => `
               <div class="strip-item">
-                ${stripImg(src, `${d.name}的照片 ${i + 1}`)}
+                ${stripImg(src, `${d.name}的照片 ${i + 1}`, i === 0)}
               </div>`).join('')}
           </div>
         </div>
@@ -2342,8 +2350,10 @@ function renderDogPage(d){
 }
 
 function openDogPage(d){
+  // 先把內容畫好再播轉場動畫，照片就能在動畫的 340ms 裡先下載，
+  // 而不是等動畫跑完才開始。此時 view-dog 還是隱藏的，不會閃動。
+  renderDogPage(d);
   playTransition(() => {
-    renderDogPage(d);
     applyView('dog');
     fallbackStack.push('dog');
     if(historyOK){
