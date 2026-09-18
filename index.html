@@ -1793,7 +1793,7 @@ const news = [
         ${w.photos.length ? `
           <div class="strip-scroll" id="${sid}">
             <div class="strip-track">
-              ${w.photos.map((src, k) => `<div class="strip-item"><img src="${src}" alt="${w.eyebrow}照片 ${k + 1}" loading="lazy" decoding="async"></div>`).join('')}
+              ${w.photos.map((src, k) => `<div class="strip-item">${stripImg(src, `${w.eyebrow}照片 ${k + 1}`)}</div>`).join('')}
             </div>
           </div>
           ${w.photos.length > 1 ? `
@@ -1813,6 +1813,7 @@ const news = [
       </div>
     `;
     box.appendChild(el);
+    armLazyStrip(el.querySelector('.strip-scroll'));
   });
 
   box.addEventListener('click', e => {
@@ -1860,7 +1861,7 @@ const news = [
     const slide = document.createElement('div');
     slide.className = 'carousel-slide';
     slide.innerHTML = a.src
-      ? `<img src="${a.src}" alt="${a.caption}" loading="lazy" decoding="async">`
+      ? `<img src="${mediumSrc(a.src)}" alt="${a.caption}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${a.src}'">`
       : `<div class="carousel-ph"><div class="em">${a.emoji}</div><span class="hint">照片準備中</span></div>`;
     track.appendChild(slide);
   });
@@ -1910,7 +1911,7 @@ function renderNewsPage(n){
           <h1>${n.title}</h1>
           <p>${n.when}${n.place ? '<br>' + n.place : ''}</p>
         </div>
-        ${cover ? `<div class="banner-photo"><img src="${cover}" alt="${n.title}" loading="lazy" decoding="async"></div>` : ''}
+        ${cover ? `<div class="banner-photo"><img src="${mediumSrc(cover)}" alt="${n.title}" decoding="async" onerror="this.onerror=null;this.src='${cover}'"></div>` : ''}
       </div>
     </div>
 
@@ -1919,7 +1920,7 @@ function renderNewsPage(n){
       <div class="photo-strip">
         <div class="strip-scroll" id="newsStrip">
           <div class="strip-track">
-            ${rest.map((src, i) => `<div class="strip-item"><img src="${src}" alt="${n.title}活動照片 ${i + 2}" loading="lazy" decoding="async"></div>`).join('')}
+            ${rest.map((src, i) => `<div class="strip-item">${stripImg(src, `${n.title}活動照片 ${i + 2}`)}</div>`).join('')}
           </div>
         </div>
         <button class="strip-btn prev" id="newsStripPrev" aria-label="上一張">‹</button>
@@ -1959,6 +1960,7 @@ function renderNewsPage(n){
 
   const scroll = document.getElementById('newsStrip');
   if(scroll){
+    armLazyStrip(scroll);
     const step = () => Math.min(446, scroll.clientWidth * 0.85);
     document.getElementById('newsStripPrev').addEventListener('click', () => scroll.scrollBy({left: -step(), behavior:'smooth'}));
     document.getElementById('newsStripNext').addEventListener('click', () => scroll.scrollBy({left:  step(), behavior:'smooth'}));
@@ -1997,7 +1999,7 @@ function openNewsPage(n){
     const cover = (n.photos && n.photos.length) ? n.photos[0] : '';
     el.innerHTML = `
       ${cover
-        ? `<div class="news-thumb"><img src="${cover}" alt="${n.title}" loading="lazy"${n.coverPos ? ` style="object-position:center ${n.coverPos}"` : ''}></div>`
+        ? `<div class="news-thumb"><img src="${mediumSrc(cover)}" alt="${n.title}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${cover}'"${n.coverPos ? ` style="object-position:center ${n.coverPos}"` : ''}></div>`
         : `<div class="news-thumb ph ${TAG_TONE[n.tag] || 'tone-member'}">
              <span class="em">${TAG_EMOJI[n.tag] || '🐾'}</span>
              <span class="lb">${n.tag}</span>
@@ -2150,29 +2152,8 @@ function goBack(){
   applyView(currentView());
 }
 
-// 初始載入
-let initial = 'home';
-let initialDog = null;
-let initialNews = null;
-try{
-  const hash = location.hash ? location.hash.slice(1) : '';
-  if(hash.indexOf('dog-') === 0){
-    const d = dogs.find(x => x.id === hash.slice(4));
-    if(d){ initial = 'dog'; initialDog = d; }
-  } else if(hash.indexOf('news-') === 0){
-    const n = news.find(x => x.id === hash.slice(5) && !x.hidden);
-    if(n){ initial = 'news'; initialNews = n; }
-  } else if(views.includes(hash) && hash !== 'dog' && hash !== 'news'){ initial = hash; }
-}catch(err){ /* 忽略 */ }
-
-fallbackStack.push(initial);
-if(initialDog) renderDogPage(initialDog);
-if(initialNews) renderNewsPage(initialNews);
-applyView(initial);
-if(historyOK){
-  try{ history.replaceState({view:initial}, '', '#' + initial); }
-  catch(err){ historyOK = false; }
-}
+/* 初始載入（依網址決定開哪一頁）搬到整支腳本的最後面了，
+   因為它會呼叫 renderDogPage()，而後者用到下面才宣告的 STATUS。 */
 
 /* ========== 狗狗卡片 ========== */
 const STATUS = {
@@ -2218,9 +2199,57 @@ function smallSrc(src){
   return src.replace(/\.jpe?g$/i, '-s.webp');
 }
 
-/* 卡片用的小張縮圖（640px WebP），詳細頁仍使用原圖 */
+/* 卡片用的小張縮圖（640px WebP） */
 function thumbSrc(src){
   return src.replace(/\.jpe?g$/i, '-t.webp');
+}
+
+/* 照片條、活動頁橫幅用的中尺寸圖（700px WebP）
+   ⚠️ 新增任何一張會出現在照片條的照片，都要一併產生對應的 -m.webp。
+   萬一忘了，圖片的 onerror 會自動退回原始 jpg，不會破圖，只是會比較慢。 */
+function mediumSrc(src){
+  return src.replace(/\.jpe?g$/i, '-m.webp');
+}
+
+/* 照片條的圖片標記：一律先不給 src，全部交給 armLazyStrip 決定何時載入。
+   連第一張也不預先載，是因為隱藏分頁（認識我們）裡的照片條在 display:none 時
+   不會與視窗相交，這樣整條都不會被下載；分頁一打開才開始抓。 */
+function stripImg(src, alt){
+  return `<img data-src="${mediumSrc(src)}" alt="${alt}" decoding="async" onerror="this.onerror=null;this.src='${src}'">`;
+}
+
+/* 照片條逐張載入。
+   瀏覽器原生的 loading="lazy" 預載範圍很寬（約 2500px），照片條一張才 446px，
+   等於一開頁面就抓六張以上。這裡改成兩層 IntersectionObserver：
+   外層等整條照片條接近視窗才啟動，內層在照片條自己的水平捲軸上，
+   只預抓右邊 700px 內的下一張。 */
+function armLazyStrip(scrollEl){
+  if(!scrollEl) return;
+  const loadAll = () => scrollEl.querySelectorAll('img[data-src]').forEach(img => {
+    img.src = img.dataset.src; delete img.dataset.src;
+  });
+  if(!('IntersectionObserver' in window)){ loadAll(); return; }
+
+  const armInner = () => {
+    const imgs = scrollEl.querySelectorAll('img[data-src]');
+    if(!imgs.length) return;
+    const io = new IntersectionObserver((entries, obs) => {
+      entries.forEach(en => {
+        if(!en.isIntersecting) return;
+        const img = en.target;
+        if(img.dataset.src){ img.src = img.dataset.src; delete img.dataset.src; }
+        obs.unobserve(img);
+      });
+    }, { root: scrollEl, rootMargin: '0px 500px', threshold: 0 });
+    imgs.forEach(img => io.observe(img));
+  };
+
+  const outer = new IntersectionObserver((entries, obs) => {
+    if(!entries.some(en => en.isIntersecting)) return;
+    obs.disconnect();
+    armInner();
+  }, { rootMargin: '400px 0px', threshold: 0 });
+  outer.observe(scrollEl);
 }
 
 function dogPhotos(d){
@@ -2249,7 +2278,7 @@ function renderDogPage(d){
           <div class="strip-track">
             ${pics.map((src, i) => `
               <div class="strip-item">
-                <img src="${src}" alt="${d.name}的照片 ${i + 1}" loading="lazy">
+                ${stripImg(src, `${d.name}的照片 ${i + 1}`)}
               </div>`).join('')}
           </div>
         </div>
@@ -2301,6 +2330,7 @@ function renderDogPage(d){
   // 照片條左右捲動
   const scroll = document.getElementById('stripScroll');
   if(scroll){
+    armLazyStrip(scroll);
     const step = () => Math.min(446, scroll.clientWidth * 0.85);
     document.getElementById('stripPrev').addEventListener('click', () => scroll.scrollBy({left: -step(), behavior:'smooth'}));
     document.getElementById('stripNext').addEventListener('click', () => scroll.scrollBy({left:  step(), behavior:'smooth'}));
@@ -2456,6 +2486,45 @@ renderFaq('全部');
   if (page) page.remove();
   const i = views.indexOf('shop');          // 網址列直接打 #shop 也不會開
   if (i > -1) views.splice(i, 1);
+})();
+
+/* ========== 初始載入：依網址決定開哪一頁 ==========
+   ⚠️ 這一段一定要放在腳本最後面。它會呼叫 renderDogPage() / renderNewsPage()，
+   而那兩個函式用到 STATUS、TAG_CLASS 這些 const。const 在宣告之前不能使用，
+   之前這段放在中間，導致直接開 apcncnu.github.io/#dog-A06 會丟出
+   「Cannot access 'STATUS' before initialization」而退回首頁。
+   放在最後也順便讓 SHOW_SHOP=false 時，網址列打 #shop 不會開。 */
+(function initialRoute(){
+  let initial = 'home';
+  let initialDog = null;
+  let initialNews = null;
+  try{
+    const hash = location.hash ? location.hash.slice(1) : '';
+    if(hash.indexOf('dog-') === 0){
+      const d = dogs.find(x => x.id === hash.slice(4));
+      if(d){ initial = 'dog'; initialDog = d; }
+    } else if(hash.indexOf('news-') === 0){
+      const n = news.find(x => x.id === hash.slice(5) && !x.hidden);
+      if(n){ initial = 'news'; initialNews = n; }
+    } else if(views.includes(hash) && hash !== 'dog' && hash !== 'news'){ initial = hash; }
+  }catch(err){ /* 忽略 */ }
+
+  fallbackStack.push(initial);
+  if(initialDog) renderDogPage(initialDog);
+  if(initialNews) renderNewsPage(initialNews);
+  applyView(initial);
+
+  if(historyOK){
+    // 網址要保留 dog-A06 / news-xxx，不能只留 #dog，否則分享出去的連結會失效
+    const st = initialDog ? {view:'dog', dog:initialDog.id}
+             : initialNews ? {view:'news', news:initialNews.id}
+             : {view:initial};
+    const url = '#' + (initialDog ? 'dog-' + initialDog.id
+                     : initialNews ? 'news-' + initialNews.id
+                     : initial);
+    try{ history.replaceState(st, '', url); }
+    catch(err){ historyOK = false; }
+  }
 })();
 </script>
 
