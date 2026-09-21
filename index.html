@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>校園狗狗認養｜暨南大學-動保社</title>
-<meta name="description" content="國立暨南國際大學動物保護社（暨大動保社）官方網站。我們照顧校園犬舍的狗狗，提供認養資訊、犬舍日常照護、醫療與動物保護教育推廣。目前有 13 隻等待認養的校園犬，歡迎先認識牠們。">
+<meta name="description" content="國立暨南國際大學動物保護社（暨大動保社）官方網站。我們照顧校園犬舍的狗狗，提供認養資訊、犬舍日常照護、醫療與動物保護教育推廣。目前有 12 隻等待認養的校園犬，歡迎先認識牠們。">
 <link rel="canonical" href="https://apcncnu.github.io/">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#F6EEDF">
@@ -15,14 +15,14 @@
 <meta property="og:locale" content="zh_TW">
 <meta property="og:url" content="https://apcncnu.github.io/">
 <meta property="og:title" content="校園狗狗認養｜暨南大學-動保社">
-<meta property="og:description" content="國立暨南國際大學動物保護社（暨大動保社）官方網站。我們照顧校園犬舍的狗狗，提供認養資訊、犬舍日常照護、醫療與動物保護教育推廣。目前有 13 隻等待認養的校園犬，歡迎先認識牠們。">
+<meta property="og:description" content="國立暨南國際大學動物保護社（暨大動保社）官方網站。我們照顧校園犬舍的狗狗，提供認養資訊、犬舍日常照護、醫療與動物保護教育推廣。目前有 12 隻等待認養的校園犬，歡迎先認識牠們。">
 <meta property="og:image" content="https://apcncnu.github.io/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="暨南大學-動保社－校園狗狗認養">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="校園狗狗認養｜暨南大學-動保社">
-<meta name="twitter:description" content="國立暨南國際大學動物保護社（暨大動保社）官方網站。我們照顧校園犬舍的狗狗，提供認養資訊、犬舍日常照護、醫療與動物保護教育推廣。目前有 13 隻等待認養的校園犬，歡迎先認識牠們。">
+<meta name="twitter:description" content="國立暨南國際大學動物保護社（暨大動保社）官方網站。我們照顧校園犬舍的狗狗，提供認養資訊、犬舍日常照護、醫療與動物保護教育推廣。目前有 12 隻等待認養的校園犬，歡迎先認識牠們。">
 <meta name="twitter:image" content="https://apcncnu.github.io/og-image.jpg">
 
 <link rel="icon" href="favicon.ico" sizes="any">
@@ -48,7 +48,7 @@
   "url": "https://apcncnu.github.io/",
   "logo": "https://apcncnu.github.io/icon-512.png",
   "image": "https://apcncnu.github.io/og-image.jpg",
-  "description": "國立暨南國際大學動物保護社（暨大動保社）官方網站。我們照顧校園犬舍的狗狗，提供認養資訊、犬舍日常照護、醫療與動物保護教育推廣。目前有 13 隻等待認養的校園犬，歡迎先認識牠們。",
+  "description": "國立暨南國際大學動物保護社（暨大動保社）官方網站。我們照顧校園犬舍的狗狗，提供認養資訊、犬舍日常照護、醫療與動物保護教育推廣。目前有 12 隻等待認養的校園犬，歡迎先認識牠們。",
   "foundingDate": "2002",
   "areaServed": "國立暨南國際大學",
   "email": "apc.ncnu@gmail.com",
@@ -133,6 +133,15 @@
   .status{ display:inline-flex; align-items:center; gap:6px; font-size:0.9rem; font-weight:800; padding:6px 14px; border-radius:999px; margin-bottom:8px; }
   .status.waiting{ background:#FBEEDC; color:var(--amber-deep); }
   .status.adopted{ background:#E3EBD6; color:var(--sage-deep); }
+  /* 小天使：已離世的狗狗，放在列表最下方紀念 */
+  .status.angel{ background:#ECE6F2; color:#6B5A86; }
+  .tag.is-angel .tag-photo img{ filter:grayscale(0.3); }
+  .tag.is-angel .tag-more{ color:var(--ink-soft); }
+  .angel-section{ margin-top:60px; }
+  .angel-section .angel-head{ text-align:center; margin-bottom:22px; }
+  .angel-section h2{ font-size:1.45rem; margin:0 0 8px; }
+  .angel-section .angel-head p{ color:var(--ink-soft); margin:0; }
+  .angel-note{ background:#F4F0F8; border-radius:18px; padding:22px 24px; color:#5B4C73; line-height:1.9; }
   .tag.is-adopted .tag-photo img{ filter:grayscale(0.35); }
 
   /* ---------- VIEWS ---------- */
@@ -1262,6 +1271,10 @@
    ★ 詳細的操作步驟請看「網站維護說明書」。
    ============================================================ */
 
+/* 狗狗的 status 有三種：
+     'waiting'  等待認養
+     'adopted'  已認養（卡片留著，標示已有家）
+     'angel'    小天使（已離開的狗狗，移到列表最下方的紀念區，不計入等待認養的數量） */
 const dogs = [
   {id:'A01', name:'橘子', breed:'米克斯', age:'4 歲', gender:'母',
    traits:['親人天花板','愛撒嬌鬼','聰明小機靈','耳朵會跳舞','出遊神隊友'],
@@ -1465,7 +1478,7 @@ const dogs = [
    health:'已完成寵物登記、疫苗注射與絕育。雖然已經 12 歲，身體依然相當硬朗，散步時腳步輕巧靈活。',
    skills:'',
    note:'初次見面時會有些害羞膽小，習慣安靜地趴著觀察周遭，需要一點時間慢慢熟悉。',
-   status:'waiting',
+   status:'angel',
    photos:['humei-1.jpg']}
 ];
 
@@ -2172,13 +2185,14 @@ function goBack(){
 const STATUS = {
   waiting: {label:'🐾 等待認養', cls:'waiting'},
   adopted: {label:'🏠 已認養', cls:'adopted'},
+  angel:   {label:'🌈 小天使', cls:'angel'},     // 已經離開的狗狗
 };
 
 function dogCard(d, clickable = true){
   const st = STATUS[d.status] || STATUS.waiting;
   const el = document.createElement('button');
   const sex = d.gender === '公' ? 'male' : (d.gender === '母' ? 'female' : '');
-  el.className = 'tag' + (sex ? ' ' + sex : '') + (d.status === 'adopted' ? ' is-adopted' : '');
+  el.className = 'tag' + (sex ? ' ' + sex : '') + (d.status === 'adopted' ? ' is-adopted' : '') + (d.status === 'angel' ? ' is-angel' : '');
   el.type = 'button';
   el.innerHTML = `
     <div class="tag-hole"></div>
@@ -2197,10 +2211,28 @@ function dogCard(d, clickable = true){
 }
 
 const dogsGrid = document.getElementById('dogsGrid');
-dogs.forEach(d => dogsGrid.appendChild(dogCard(d)));
+dogs.filter(d => d.status !== 'angel').forEach(d => dogsGrid.appendChild(dogCard(d)));
+
+/* 小天使：status:'angel' 的狗狗不出現在上面的列表與首頁，
+   改放在列表頁最下方的紀念區塊，點進去仍看得到牠的照片和故事。 */
+(function renderAngels(){
+  const angels = dogs.filter(d => d.status === 'angel');
+  if(!angels.length || !dogsGrid) return;
+  const sec = document.createElement('div');
+  sec.className = 'angel-section';
+  sec.innerHTML = `
+    <div class="angel-head">
+      <h2>🌈 我們的小天使</h2>
+      <p>謝謝牠們曾經陪伴我們，在這裡留下牠們的故事。</p>
+    </div>
+    <div class="dogs-grid"></div>`;
+  const grid = sec.querySelector('.dogs-grid');
+  angels.forEach(d => grid.appendChild(dogCard(d)));
+  dogsGrid.parentNode.appendChild(sec);
+})();
 
 const dogsPreview = document.getElementById('dogsPreview');
-dogs.slice(0,4).forEach(d => dogsPreview.appendChild(dogCard(d, false)));
+dogs.filter(d => d.status !== 'angel').slice(0,4).forEach(d => dogsPreview.appendChild(dogCard(d, false)));
 
 /* ========== 狗狗詳情：獨立分頁 ==========
    每隻狗可在資料裡加 photos:['圖片網址1','圖片網址2', ...]，
@@ -2325,6 +2357,7 @@ function dogPhotos(d){
 function renderDogPage(d){
   const st = STATUS[d.status] || STATUS.waiting;
   const adopted = d.status === 'adopted';
+  const angel = d.status === 'angel';
   const pics = dogPhotos(d);
   // 橫幅底色依性別：公＝淡藍、母＝淡粉、未填＝米黃
   const bannerTone = d.gender === '公' ? ' sky' : (d.gender === '母' ? ' rose' : '');
@@ -2360,15 +2393,15 @@ function renderDogPage(d){
             <div class="fact"><div class="k">品種</div><div class="v">${d.breed}</div></div>
             <div class="fact"><div class="k">年齡</div><div class="v">${d.age}</div></div>
             <div class="fact"><div class="k">性別</div><div class="v">${d.gender}</div></div>
-            <div class="fact"><div class="k">狀態</div><div class="v">${adopted ? '已認養' : '等待認養'}</div></div>
+            <div class="fact"><div class="k">狀態</div><div class="v">${angel ? '小天使' : (adopted ? '已認養' : '等待認養')}</div></div>
           </div>
 
           <div class="dog-sec"><h3>個性小故事</h3>${(Array.isArray(d.story) ? d.story : [d.story]).map(t => `<p>${t}</p>`).join('')}</div>
           <div class="dog-sec"><h3>健康狀況</h3><p>${d.health || '資料整理中'}</p></div>
           ${d.skills ? `<div class="dog-sec"><h3>已經會的事</h3><p>${d.skills}</p></div>` : ''}
-          <div class="dog-sec"><h3>目前住處</h3><p>由社團同學輪流照顧的校內犬舍。犬舍不是公開區域，想探望牠請先用官方 LINE 與我們約時間。</p></div>
+          ${angel ? '' : `<div class="dog-sec"><h3>目前住處</h3><p>由社團同學輪流照顧的校內犬舍。犬舍不是公開區域，想探望牠請先用官方 LINE 與我們約時間。</p></div>`}
 
-          ${d.note ? `<div class="match-box">
+          ${d.note && !angel ? `<div class="match-box">
             <div class="match-title">🏡 認養前請留意：相處評估</div>
             <p>${d.note}</p>
             <p style="margin-top:10px; font-size:0.85rem; color:var(--ink-soft);">牠們長期生活在犬舍，沒有訓練過在尿布墊定點如廁，接回家後需要一段時間重新建立習慣，這是所有校園狗狗共通的狀況。</p>
@@ -2377,7 +2410,11 @@ function renderDogPage(d){
 
         <aside class="dog-side">
           <div class="dog-actions">
-            ${adopted
+            ${angel
+              ? `<h4>${d.name}已經成為小天使 🌈</h4>
+                 <div class="angel-note">謝謝${d.name}陪伴我們的每一天，也謝謝每一位關心過牠的人。</div>
+                 <button class="btn btn-rose panel-btn" data-view="dogs" style="margin-top:16px;">看看其他狗狗 🐾</button>`
+              : adopted
               ? `<h4>${d.name}已經有家了 🏠</h4>
                  <p>謝謝大家一路上的關心。歡迎回去看看其他還在等待家人的狗狗。</p>
                  <button class="btn btn-rose panel-btn" data-view="dogs">看看其他狗狗 🐾</button>`
@@ -2400,7 +2437,7 @@ function renderDogPage(d){
     document.getElementById('stripNext').addEventListener('click', () => scroll.scrollBy({left:  step(), behavior:'smooth'}));
   }
 
-  if(!adopted){
+  if(!adopted && !angel){
     document.getElementById('wantAdopt').addEventListener('click', openAdoptModal);
   }
 }
@@ -2536,7 +2573,7 @@ FAQ_CATS.forEach((c, i) => {
 renderFaq('全部');
 /* ========== 狗狗數量自動同步（避免手動改數字改漏） ========== */
 (function syncDogCount(){
-  const n = dogs.filter(d => d.status !== 'adopted').length;
+  const n = dogs.filter(d => d.status !== 'adopted' && d.status !== 'angel').length;
   document.querySelectorAll('.dog-count').forEach(el => { el.textContent = n; });
 })();
 /* ========== 文創商品開關（SHOW_SHOP=false 時整區隱藏） ========== */
